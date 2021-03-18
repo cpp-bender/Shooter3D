@@ -11,9 +11,13 @@ public class PlayerController : MonoBehaviour
     [Header("Mouse Look Settings")]
     [SerializeField] private Camera mainCamera;
 
+    [Header("Shooting Settings")]
+    [SerializeField] private GunController gunController;
+
     private void Update()
     {
         Rotate();
+        Shoot();
     }
 
     private void FixedUpdate()
@@ -37,6 +41,14 @@ public class PlayerController : MonoBehaviour
             Vector3 rayPoint = ray.GetPoint(rayDistance);
             Vector3 lookPoint = new Vector3(rayPoint.x, transform.position.y, rayPoint.z);
             transform.LookAt(lookPoint);
+        }
+    }
+
+    private void Shoot()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            gunController.Shoot();
         }
     }
 }
