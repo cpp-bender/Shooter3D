@@ -3,7 +3,8 @@
 [CreateAssetMenu(menuName = "TopDown Shooter/Shooting Settings")]
 public class ShootingSettings : ScriptableObject
 {
-    [SerializeField] private float shootingDelay;
+    [Header("Shooting Settings")]
+    [SerializeField] private float delay;
 
-    public float ShootingDelay { get => shootingDelay; }
+    public float Delay { get => delay; }
 }

@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : Entity
 {
     [Header("Movement Settings")]
     [SerializeField] private Rigidbody body;
-    [SerializeField] private PlayerMovementData playerData;
+    [SerializeField] private PlayerMovementSettings playerData;
     private Vector3 moveVelocity;
 
     [Header("Mouse Look Settings")]
@@ -13,6 +13,14 @@ public class PlayerController : MonoBehaviour
 
     [Header("Shooting Settings")]
     [SerializeField] private GunController gunController;
+
+    [Header("Player Settings")]
+    [SerializeField] private float startingHealth;
+
+    private void Start()
+    {
+        health = startingHealth;  
+    }
 
     private void Update()
     {

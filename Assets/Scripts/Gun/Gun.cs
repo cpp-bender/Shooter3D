@@ -2,6 +2,7 @@
 
 public class Gun : MonoBehaviour
 {
+    [Header("Gun Settings")]
     [SerializeField] private Transform muzzle;
     [SerializeField] private ProjectTile projectTile;
     [SerializeField] private ShootingSettings shootingSettings;
@@ -10,7 +11,7 @@ public class Gun : MonoBehaviour
 
     private void Start()
     {
-        SetPassedTime(shootingSettings.ShootingDelay);
+        SetPassedTime(shootingSettings.Delay);
     }
 
     private void Update()
@@ -32,7 +33,7 @@ public class Gun : MonoBehaviour
     {
         //TODO: Use a coroutine in this method
         //TODO: Add pooling system
-        if (passedTime >= shootingSettings.ShootingDelay)
+        if (passedTime >= shootingSettings.Delay)
         {
             Instantiate(projectTile, muzzle.position, muzzle.rotation);
             SetPassedTime(0f);

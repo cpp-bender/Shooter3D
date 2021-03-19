@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a52e4def8ed7e5f489da30662f398fab, type: 3}
   m_Name: ProjectTileData
   m_EditorClassIdentifier: 
-  bulletSpeed: 5
+  speed: 10
+  damage: 1
+  refreshRate: 1

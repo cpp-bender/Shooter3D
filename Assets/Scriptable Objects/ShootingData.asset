@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 593d0384d582f1a4b8f4ba0fc8d691e0, type: 3}
   m_Name: ShootingData
   m_EditorClassIdentifier: 
-  shootingDelay: 1
+  delay: 1

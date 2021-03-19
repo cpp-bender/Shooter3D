@@ -94,3 +94,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   projectTileSettings: {fileID: 11400000, guid: c5d1126e90b5fdf478cae7e89e13f137,
     type: 2}
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 4294967295

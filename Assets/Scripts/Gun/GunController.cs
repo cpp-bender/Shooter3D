@@ -2,6 +2,7 @@
 
 public class GunController : MonoBehaviour
 {
+    [Header("Gun Settings")]
     [SerializeField] private Transform weaponHold;
     [SerializeField] private Gun startingGun;
     private Gun currentGun;
