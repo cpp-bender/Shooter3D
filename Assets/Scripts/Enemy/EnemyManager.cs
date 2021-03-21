@@ -13,7 +13,7 @@ public class EnemyManager : Entity
 
     private void Start()
     {
-        StartCoroutine(FollowPlayer(projectTileSettings.RefreshRate));
+        StartCoroutine(FollowPlayer(projectTileSettings.RefireRate));
         health = startingHealth;
     }
 
@@ -22,7 +22,7 @@ public class EnemyManager : Entity
         while (target != null)
         {
             agent.SetDestination(target.position);
-            yield return new WaitForSeconds(projectTileSettings.RefreshRate);
+            yield return new WaitForSeconds(projectTileSettings.RefireRate);
         }
     }
 }

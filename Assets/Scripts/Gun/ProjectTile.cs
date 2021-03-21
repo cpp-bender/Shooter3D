@@ -6,32 +6,59 @@ public class ProjectTile : MonoBehaviour
     [SerializeField] private ProjectTileSettings projectTileSettings;
     [SerializeField] private LayerMask collisionMask;
 
+    private PoolManager pool;
+    private float lifeTime;
+
+    private void OnEnable()
+    {
+        lifeTime = 0f;
+    }
+
+    private void Awake()
+    {
+        pool = new PoolManager();
+    }
 
     private void Update()
     {
+        IncrementPassedTime();
+        Destroy();
         CheckCollision();
         Move();
+    }
+
+    private void Destroy()
+    {
+        if (lifeTime >= projectTileSettings.MaxLifeTime)
+        {
+            pool.ReturnToPool(gameObject);
+        }
+    }
+
+    private void IncrementPassedTime()
+    {
+        lifeTime += Time.deltaTime;
     }
 
     private void CheckCollision()
     {
         float moveDistance = projectTileSettings.Speed * Time.deltaTime;
         RaycastHit hitInfo;
-        Ray ray = new Ray(transform.position, Vector3.forward);
+        Ray ray = new Ray(transform.position, transform.forward);
         if (Physics.Raycast(ray, out hitInfo, moveDistance, collisionMask))
         {
-            OnHit(hitInfo);
+            OnHitEnter(hitInfo);
         }
     }
 
-    private void OnHit(RaycastHit hitInfo)
+    private void OnHitEnter(RaycastHit hitInfo)
     {
         IDamageable damageable = hitInfo.collider.GetComponent<IDamageable>();
         if (damageable != null)
         {
             damageable.TakeHit(projectTileSettings.Damage, hitInfo);
         }
-        Destroy(gameObject);
+        pool.ReturnToPool(gameObject);
     }
 
     private void Move()

@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 10
   damage: 1
-  refreshRate: 1
+  refireRate: 0.5
+  maxLifeTime: 2.5

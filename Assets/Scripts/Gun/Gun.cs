@@ -7,11 +7,17 @@ public class Gun : MonoBehaviour
     [SerializeField] private ProjectTile projectTile;
     [SerializeField] private ShootingSettings shootingSettings;
 
+    private PoolManager poolManager;
     private float passedTime = 0;
+
+    private void Awake()
+    {
+        poolManager = new PoolManager();
+    }
 
     private void Start()
     {
-        SetPassedTime(shootingSettings.Delay);
+        SetDelay(shootingSettings.Delay);
     }
 
     private void Update()
@@ -19,7 +25,7 @@ public class Gun : MonoBehaviour
         IncrementPassedTime();
     }
 
-    private void SetPassedTime(float time)
+    private void SetDelay(float time)
     {
         passedTime = time;
     }
@@ -31,12 +37,38 @@ public class Gun : MonoBehaviour
 
     public void Shoot()
     {
-        //TODO: Use a coroutine in this method
-        //TODO: Add pooling system
         if (passedTime >= shootingSettings.Delay)
         {
-            Instantiate(projectTile, muzzle.position, muzzle.rotation);
-            SetPassedTime(0f);
+            //Pooling System
+            if (poolManager.Bullets.Count == 0)
+            {
+                poolManager.AddToPool(InstantiateBullet());
+            }
+            MoveBullet(poolManager.GetFromPool());
+            SetDelay(0f);
         }
+    }
+
+    private GameObject InstantiateBullet()
+    {
+        var bullet = Instantiate(projectTile, muzzle.position, muzzle.rotation).gameObject;
+        bullet.SetActive(false);
+        return bullet;
+    }
+
+    private void MoveBullet(GameObject bullet)
+    {
+        if (bullet == null)
+        {
+            var projectTile = InstantiateBullet();
+            poolManager.AddToPool(projectTile.gameObject);
+            projectTile.transform.position = muzzle.position;
+            projectTile.transform.rotation = muzzle.rotation;
+            projectTile.SetActive(true);
+            return;
+        }
+        bullet.transform.position = muzzle.position;
+        bullet.transform.rotation = muzzle.rotation;
+        bullet.SetActive(true);
     }
 }

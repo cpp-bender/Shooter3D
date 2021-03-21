@@ -6,9 +6,11 @@ public class ProjectTileSettings : ScriptableObject
     [Header("Bullet Settings")]
     [SerializeField] private float speed;
     [SerializeField] private float damage;
-    [SerializeField] private float refreshRate;
+    [SerializeField] private float refireRate;
+    [SerializeField] private float maxLifeTime;
 
     public float Speed { get => speed; }
     public float Damage { get => damage; }
-    public float RefreshRate { get => refreshRate; }
+    public float RefireRate { get => refireRate; }
+    public float MaxLifeTime { get => maxLifeTime; }
 }
