@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [CreateAssetMenu(menuName = "TopDown Shooter/Player Movement Settings")]
-public class PlayerMovementSettings : ScriptableObject
+public class PlayerSettings : ScriptableObject
 {
     [Header("Player Movement Settings")]
     [SerializeField] private float moveSpeed;

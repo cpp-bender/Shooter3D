@@ -9,35 +9,30 @@ public class ProjectTile : MonoBehaviour
     private PoolManager pool;
     private float lifeTime;
 
-    private void OnEnable()
-    {
-        lifeTime = 0f;
-    }
-
     private void Awake()
     {
         pool = new PoolManager();
     }
 
+    private void OnEnable()
+    {
+        lifeTime = Time.time + projectTileSettings.MaxLifeTime;
+    }
+
     private void Update()
     {
-        IncrementPassedTime();
-        Destroy();
         CheckCollision();
         Move();
+        Destroy();
     }
 
     private void Destroy()
     {
-        if (lifeTime >= projectTileSettings.MaxLifeTime)
+        if (Time.time > lifeTime)
         {
+            lifeTime = Time.time + projectTileSettings.MaxLifeTime;
             pool.ReturnToPool(gameObject);
         }
-    }
-
-    private void IncrementPassedTime()
-    {
-        lifeTime += Time.deltaTime;
     }
 
     private void CheckCollision()

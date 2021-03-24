@@ -8,36 +8,16 @@ public class Gun : MonoBehaviour
     [SerializeField] private ShootingSettings shootingSettings;
 
     private PoolManager poolManager;
-    private float passedTime = 0;
+    private float nextShootTime = 0f;
 
     private void Awake()
     {
         poolManager = new PoolManager();
     }
 
-    private void Start()
-    {
-        SetDelay(shootingSettings.Delay);
-    }
-
-    private void Update()
-    {
-        IncrementPassedTime();
-    }
-
-    private void SetDelay(float time)
-    {
-        passedTime = time;
-    }
-
-    private void IncrementPassedTime()
-    {
-        passedTime += Time.deltaTime;
-    }
-
     public void Shoot()
     {
-        if (passedTime >= shootingSettings.Delay)
+        if (Time.time > nextShootTime)
         {
             //Pooling System
             if (poolManager.Bullets.Count == 0)
@@ -45,7 +25,7 @@ public class Gun : MonoBehaviour
                 poolManager.AddToPool(InstantiateBullet());
             }
             MoveBullet(poolManager.GetFromPool());
-            SetDelay(0f);
+            nextShootTime = Time.time + shootingSettings.Delay;
         }
     }
 

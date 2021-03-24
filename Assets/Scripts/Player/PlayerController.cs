@@ -5,7 +5,7 @@ public class PlayerController : Entity
 {
     [Header("Movement Settings")]
     [SerializeField] private Rigidbody body;
-    [SerializeField] private PlayerMovementSettings playerData;
+    [SerializeField] private PlayerSettings playerData;
     private Vector3 moveVelocity;
 
     [Header("Mouse Look Settings")]
