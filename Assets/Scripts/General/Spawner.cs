@@ -2,19 +2,21 @@
 
 public class Spawner : MonoBehaviour
 {
-    [SerializeField] private EnemyManager enemy;
+    [SerializeField] private Entity enemy;
+    [SerializeField] private Entity player;
     [SerializeField] private Wave[] waves;
 
-    Wave currentWave;
-    int currentWaveNumber;
-
-    int enemiesRemainingToSpawn;
-    int enemiesRemainingAlive;
-    float nextSpawnTime;
+    //Current Wave Fields
+    private Wave currentWave;
+    private int currentWaveNumber;
+    private int enemiesRemainingToSpawn;
+    private int enemiesRemainingAlive;
+    private float nextSpawnTime;
 
     private void Start()
     {
         InitializeNextWave();
+        player.OnDeath += OnPlayerDeath;
     }
 
     private void Update()
@@ -37,6 +39,11 @@ public class Spawner : MonoBehaviour
     {
         enemiesRemainingAlive--;
         InitializeNextWave();
+    }
+
+    private void OnPlayerDeath()
+    {
+        gameObject.SetActive(false);
     }
 
     private void InitializeNextWave()

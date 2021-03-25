@@ -1,24 +1,28 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Entity : MonoBehaviour, IDamageable
 {
     protected float health;
 
-    public event Action OnDeath;
+    public event System.Action OnDeath;
 
-    public void TakeHit(float damage, RaycastHit hitInfo)
+    public void TakeDamage(float damage)
     {
         health -= damage;
         if (health <= 0)
         {
-            Die(hitInfo.collider.gameObject);
+            Die();
         }
     }
 
-    private void Die(GameObject entityToDie)
+    public void TakeHit(float damage, RaycastHit hitInfo)
+    {
+        //Will do some stuff later
+        TakeDamage(damage);
+    }
+
+    private void Die()
     {
         OnDeath?.Invoke();    
-        Destroy(entityToDie);
     }
 }

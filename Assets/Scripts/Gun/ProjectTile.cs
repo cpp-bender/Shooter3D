@@ -6,12 +6,13 @@ public class ProjectTile : MonoBehaviour
     [SerializeField] private ProjectTileSettings projectTileSettings;
     [SerializeField] private LayerMask collisionMask;
 
-    private PoolManager pool;
+    private PoolManager bulletPool;
+    private EnemyManager enemy;
     private float lifeTime;
 
     private void Awake()
     {
-        pool = new PoolManager();
+        bulletPool = new PoolManager();
     }
 
     private void OnEnable()
@@ -31,16 +32,17 @@ public class ProjectTile : MonoBehaviour
         if (Time.time > lifeTime)
         {
             lifeTime = Time.time + projectTileSettings.MaxLifeTime;
-            pool.ReturnToPool(gameObject);
+            bulletPool.ReturnToPool(gameObject);
         }
     }
 
     private void CheckCollision()
     {
         float moveDistance = projectTileSettings.Speed * Time.deltaTime;
+        float moveDistanceOffset = .2f;
         RaycastHit hitInfo;
         Ray ray = new Ray(transform.position, transform.forward);
-        if (Physics.Raycast(ray, out hitInfo, moveDistance, collisionMask))
+        if (Physics.Raycast(ray, out hitInfo, moveDistance + moveDistanceOffset, collisionMask))
         {
             OnHitEnter(hitInfo);
         }
@@ -51,9 +53,16 @@ public class ProjectTile : MonoBehaviour
         IDamageable damageable = hitInfo.collider.GetComponent<IDamageable>();
         if (damageable != null)
         {
+            enemy = hitInfo.collider.gameObject.GetComponent<EnemyManager>();
+            enemy.OnDeath += OnEnemyDeath;
             damageable.TakeHit(projectTileSettings.Damage, hitInfo);
         }
-        pool.ReturnToPool(gameObject);
+        bulletPool.ReturnToPool(gameObject);
+    }
+
+    private void OnEnemyDeath()
+    {
+        Destroy(enemy.gameObject);
     }
 
     private void Move()

@@ -8,63 +8,74 @@ public class EnemyManager : Entity
     [Header("Enemy Settings")]
     [SerializeField] private NavMeshAgent agent;
     [SerializeField] private Transform target;
-    [SerializeField] private EnemySettings enemySettings;
     [SerializeField] private float startingHealth;
-    [SerializeField] private Material skinMaterial;
 
+    //Scriptable Objects
+    [SerializeField] private EnemySettings enemyData;
+    [SerializeField] private PlayerSettings playerData;
+
+    //Enemy States
     public enum State
     {
         Idle, Chasing, Attacking
     }
 
-    private State currentState;
-    private float attackDistanceThreshold = 1f;
-    private float timeBetweenAttacks = .5f;
+    //Enemy Attack Fields
+    private State currentState = State.Idle;
     private float nextAttackTime;
     private float enemyCollisionRadius;
     private float playerCollisionRadius;
+
     private Color originalColor;
+    private Entity player;
+    private Material skinMaterial;
 
-    private void OnEnable()
+    private void Awake()
     {
-        //TODO:Could be a problem
-        target = FindObjectOfType<PlayerController>().transform;
-    }
-
-    private void OnDisable()
-    {
-        skinMaterial.color = Color.green;
+        skinMaterial = GetComponent<Renderer>().material;
+        originalColor = skinMaterial.color;
+        enemyCollisionRadius = GetComponent<CapsuleCollider>().radius;
+        health = startingHealth;
+        if (FindObjectOfType<PlayerController>().transform != null)
+        {
+            target = FindObjectOfType<PlayerController>().transform;
+            currentState = State.Chasing;
+            player = target.GetComponent<Entity>();
+            player.OnDeath += OnPlayerDeath;
+            playerCollisionRadius = target.GetComponent<CapsuleCollider>().radius;
+        }
     }
 
     private void Start()
     {
-        originalColor = skinMaterial.color;
-        enemyCollisionRadius = GetComponent<CapsuleCollider>().radius;
-        playerCollisionRadius = target.GetComponent<CapsuleCollider>().radius;
-        currentState = State.Chasing;
-        StartCoroutine(FollowPlayer(enemySettings.FollowRefreshRate));
-        health = startingHealth;
+        StartCoroutine(Follow(enemyData.FollowRefreshRate));
     }
 
     private void Update()
     {
-        OnAttackEnter();
+        TryToAttack();
     }
 
-    private void OnAttackEnter()
+    private void TryToAttack()
     {
-        if (Time.time > nextAttackTime)
+        if (!playerData.IsPlayerDead && Time.time > nextAttackTime)
         {
             float squareDistanceToTarget = (target.position - transform.position).sqrMagnitude;
-            if (squareDistanceToTarget < Mathf.Pow(attackDistanceThreshold/2 + enemyCollisionRadius + playerCollisionRadius, 2))
+            if (squareDistanceToTarget < Mathf.Pow(enemyData.AttackDistanceThreshold / 2 + enemyCollisionRadius + playerCollisionRadius, 2))
             {
-                nextAttackTime = Time.time + timeBetweenAttacks;
+                nextAttackTime = Time.time + enemyData.TimeBetweenAttacks;
                 StartCoroutine(Attack());
             }
         }
     }
 
-    IEnumerator Attack()
+    private void OnPlayerDeath()
+    {
+        playerData.IsPlayerDead = true;
+        Destroy(target.gameObject);
+    }
+
+    private IEnumerator Attack()
     {
         currentState = State.Attacking;
         agent.enabled = false;
@@ -73,9 +84,17 @@ public class EnemyManager : Entity
         Vector3 attackPosition = target.position - directionToTarget * enemyCollisionRadius;
         float percent = 0;
         float attackSpeed = 3f;
+        float damage = 1f;
         skinMaterial.color = Color.red;
+        bool hasAppliedDamage = false;
+
         while (percent <= 1)
         {
+            if (percent >= .5f && !hasAppliedDamage)
+            {
+                hasAppliedDamage = true;
+                player.TakeDamage(damage);
+            }
             percent += Time.deltaTime * attackSpeed;
             float interpolation = 4 * (-Mathf.Pow(percent, 2) + percent); // -> 4 * (-x ^ 2 + x)
             transform.position = Vector3.Lerp(enemyPosition, attackPosition, interpolation);
@@ -86,14 +105,14 @@ public class EnemyManager : Entity
         agent.enabled = true;
     }
 
-    private IEnumerator FollowPlayer(float refreshRate)
+    private IEnumerator Follow(float refreshRate)
     {
         while (target != null)
         {
             if (currentState == State.Chasing)
             {
                 Vector3 directionToTarget = (target.position - transform.position).normalized;
-                agent.SetDestination(target.position - directionToTarget * (playerCollisionRadius + enemyCollisionRadius + attackDistanceThreshold / 3));
+                agent.SetDestination(target.position - directionToTarget * (playerCollisionRadius + enemyCollisionRadius + enemyData.AttackDistanceThreshold / 3));
             }
             yield return new WaitForSeconds(refreshRate);
         }

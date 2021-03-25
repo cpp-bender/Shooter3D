@@ -245,16 +245,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemy: {fileID: 2250012160563569768, guid: c27a84d43548c784c95c8538f11df700, type: 3}
+  player: {fileID: 1571953093}
   waves:
   - count: 1
-    timeBetweenSpawns: 1
-  currentWave:
-    count: 0
     timeBetweenSpawns: 0
-  currentWaveNumber: 0
-  enemiesRemainingToSpawn: 0
-  enemiesRemainingAlive: 0
-  nextSpawnTime: 0
+  - count: 2
+    timeBetweenSpawns: 1
+  - count: 3
+    timeBetweenSpawns: 1
 --- !u!4 &513440813
 Transform:
   m_ObjectHideFlags: 0

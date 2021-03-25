@@ -17,9 +17,14 @@ public class PlayerController : Entity
     [Header("Player Settings")]
     [SerializeField] private float startingHealth;
 
-    private void Start()
+    private void OnEnable()
     {
-        health = startingHealth;  
+        playerData.IsPlayerDead = false;
+    }
+
+    private void Awake()
+    {
+        health = startingHealth;
     }
 
     private void Update()

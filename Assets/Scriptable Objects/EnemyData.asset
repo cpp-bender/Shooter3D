@@ -13,3 +13,5 @@ MonoBehaviour:
   m_Name: EnemyData
   m_EditorClassIdentifier: 
   followRefreshRate: 1
+  attackDistanceThreshold: 1
+  timeBetweenAttacks: 0.5
