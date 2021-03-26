@@ -8,7 +8,7 @@ public class Gun : MonoBehaviour
     [SerializeField] private ShootingSettings shootingSettings;
 
     private PoolManager poolManager;
-    private float nextShootTime = 0f;
+    private float nextShootTime;
 
     private void Awake()
     {

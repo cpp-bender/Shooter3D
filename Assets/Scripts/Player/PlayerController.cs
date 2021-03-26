@@ -25,6 +25,13 @@ public class PlayerController : Entity
     private void Awake()
     {
         health = startingHealth;
+        this.OnDeath += OnPlayerDeath;
+    }
+
+    private void OnPlayerDeath()
+    {
+        playerData.IsPlayerDead = true;
+        Destroy(gameObject);
     }
 
     private void Update()

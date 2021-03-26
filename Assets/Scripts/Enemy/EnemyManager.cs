@@ -41,7 +41,6 @@ public class EnemyManager : Entity
             target = FindObjectOfType<PlayerController>().transform;
             currentState = State.Chasing;
             player = target.GetComponent<Entity>();
-            player.OnDeath += OnPlayerDeath;
             playerCollisionRadius = target.GetComponent<CapsuleCollider>().radius;
         }
     }
@@ -67,12 +66,6 @@ public class EnemyManager : Entity
                 StartCoroutine(Attack());
             }
         }
-    }
-
-    private void OnPlayerDeath()
-    {
-        playerData.IsPlayerDead = true;
-        Destroy(target.gameObject);
     }
 
     private IEnumerator Attack()
