@@ -3,19 +3,12 @@
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : Entity
 {
-    [Header("Movement Settings")]
     [SerializeField] private Rigidbody body;
     [SerializeField] private PlayerSettings playerData;
-    private Vector3 moveVelocity;
-
-    [Header("Mouse Look Settings")]
     [SerializeField] private Camera mainCamera;
-
-    [Header("Shooting Settings")]
     [SerializeField] private GunController gunController;
 
-    [Header("Player Settings")]
-    [SerializeField] private float startingHealth;
+    private Vector3 moveVelocity;
 
     private void OnEnable()
     {
@@ -24,7 +17,7 @@ public class PlayerController : Entity
 
     private void Awake()
     {
-        health = startingHealth;
+        health = playerData.StartingHealth;
         this.OnDeath += OnPlayerDeath;
     }
 
@@ -59,6 +52,7 @@ public class PlayerController : Entity
         if (ground.Raycast(ray, out rayDistance))
         {
             Vector3 rayPoint = ray.GetPoint(rayDistance);
+            Debug.DrawLine(ray.origin, rayPoint, Color.red);
             Vector3 lookPoint = new Vector3(rayPoint.x, transform.position.y, rayPoint.z);
             transform.LookAt(lookPoint);
         }
@@ -66,9 +60,6 @@ public class PlayerController : Entity
 
     private void Shoot()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            gunController.Shoot();
-        }
+        gunController.Shoot();
     }
 }

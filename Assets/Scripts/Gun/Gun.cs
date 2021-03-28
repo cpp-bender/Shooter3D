@@ -2,7 +2,6 @@
 
 public class Gun : MonoBehaviour
 {
-    [Header("Gun Settings")]
     [SerializeField] private Transform muzzle;
     [SerializeField] private ProjectTile projectTile;
     [SerializeField] private ShootingSettings shootingSettings;
@@ -17,9 +16,8 @@ public class Gun : MonoBehaviour
 
     public void Shoot()
     {
-        if (Time.time > nextShootTime)
+        if (Input.GetMouseButtonDown(0) && Time.time > nextShootTime)
         {
-            //Pooling System
             if (poolManager.Bullets.Count == 0)
             {
                 poolManager.AddToPool(InstantiateBullet());

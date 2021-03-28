@@ -5,42 +5,37 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyManager : Entity
 {
-    [Header("Enemy Settings")]
-    [SerializeField] private NavMeshAgent agent;
-    [SerializeField] private Transform target;
-    [SerializeField] private float startingHealth;
-
-    //Scriptable Objects
-    [SerializeField] private EnemySettings enemyData;
-    [SerializeField] private PlayerSettings playerData;
-
-    //Enemy States
     public enum State
     {
         Idle, Chasing, Attacking
     }
 
-    //Enemy Attack Fields
+    [SerializeField] private NavMeshAgent agent;
+    [SerializeField] private Transform target;
+    [SerializeField] private EnemySettings enemyData;
+    [SerializeField] private PlayerSettings playerData;
+
     private State currentState = State.Idle;
     private float nextAttackTime;
     private float enemyCollisionRadius;
     private float playerCollisionRadius;
-
-    private Color originalColor;
-    private Entity player;
     private Material skinMaterial;
+
+    private void OnEnable()
+    {
+        skinMaterial = GetComponent<Renderer>().material;
+        enemyData.SkinColor = skinMaterial.color;
+        enemyCollisionRadius = GetComponent<CapsuleCollider>().radius;
+        health = enemyData.StartingHealth;
+    }
 
     private void Awake()
     {
-        skinMaterial = GetComponent<Renderer>().material;
-        originalColor = skinMaterial.color;
-        enemyCollisionRadius = GetComponent<CapsuleCollider>().radius;
-        health = startingHealth;
         if (FindObjectOfType<PlayerController>().transform != null)
         {
             target = FindObjectOfType<PlayerController>().transform;
+            playerData.SkinColor = target.GetComponent<Renderer>().material.color;
             currentState = State.Chasing;
-            player = target.GetComponent<Entity>();
             playerCollisionRadius = target.GetComponent<CapsuleCollider>().radius;
         }
     }
@@ -60,7 +55,8 @@ public class EnemyManager : Entity
         if (!playerData.IsPlayerDead && Time.time > nextAttackTime)
         {
             float squareDistanceToTarget = (target.position - transform.position).sqrMagnitude;
-            if (squareDistanceToTarget < Mathf.Pow(enemyData.AttackDistanceThreshold / 2 + enemyCollisionRadius + playerCollisionRadius, 2))
+            float enemyRange = Mathf.Pow(enemyData.AttackDistanceThreshold / 2 + enemyCollisionRadius + playerCollisionRadius, 2);
+            if (squareDistanceToTarget < enemyRange)
             {
                 nextAttackTime = Time.time + enemyData.TimeBetweenAttacks;
                 StartCoroutine(Attack());
@@ -76,8 +72,6 @@ public class EnemyManager : Entity
         Vector3 directionToTarget = (target.position - transform.position).normalized;
         Vector3 attackPosition = target.position - directionToTarget * enemyCollisionRadius;
         float percent = 0;
-        float attackSpeed = 3f;
-        float damage = 1f;
         skinMaterial.color = Color.red;
         bool hasAppliedDamage = false;
 
@@ -86,14 +80,18 @@ public class EnemyManager : Entity
             if (percent >= .5f && !hasAppliedDamage)
             {
                 hasAppliedDamage = true;
-                player.TakeDamage(damage);
+                target.GetComponent<PlayerController>().TakeDamage(enemyData.Damage);
+                if (!playerData.IsPlayerDead)
+                {
+                    StartCoroutine(BlinkPlayer());
+                }
             }
-            percent += Time.deltaTime * attackSpeed;
+            percent += Time.deltaTime * enemyData.AttackSpeed;
             float interpolation = 4 * (-Mathf.Pow(percent, 2) + percent); // -> 4 * (-x ^ 2 + x)
             transform.position = Vector3.Lerp(enemyPosition, attackPosition, interpolation);
             yield return null;
         }
-        skinMaterial.color = originalColor;
+        skinMaterial.color = enemyData.SkinColor;
         currentState = State.Chasing;
         agent.enabled = true;
     }
@@ -108,6 +106,23 @@ public class EnemyManager : Entity
                 agent.SetDestination(target.position - directionToTarget * (playerCollisionRadius + enemyCollisionRadius + enemyData.AttackDistanceThreshold / 3));
             }
             yield return new WaitForSeconds(refreshRate);
+        }
+    }
+
+    private IEnumerator BlinkPlayer()
+    {
+        for (int i = 0; i < 2; i++)
+        {
+            float x = 0;
+            float interpolation;
+            while (x <= 1)
+            {
+                x += Time.deltaTime * 10;
+                interpolation = 4 * (-Mathf.Pow(x, 2) + x); // -> 4 * (-x ^ 2 + x)
+                target.GetComponent<Renderer>().material.color = Color.Lerp(playerData.SkinColor, Color.red, interpolation);
+                yield return null;
+            }
+            yield return new WaitForSeconds(.2f);
         }
     }
 }

@@ -2,7 +2,6 @@
 
 public class ProjectTile : MonoBehaviour
 {
-    [Header("Bullet Settings")]
     [SerializeField] private ProjectTileSettings projectTileSettings;
     [SerializeField] private LayerMask collisionMask;
 

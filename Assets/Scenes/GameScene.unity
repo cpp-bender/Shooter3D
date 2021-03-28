@@ -252,7 +252,7 @@ MonoBehaviour:
   - count: 2
     timeBetweenSpawns: 1
   - count: 3
-    timeBetweenSpawns: 1
+    timeBetweenSpawns: 2
 --- !u!4 &513440813
 Transform:
   m_ObjectHideFlags: 0
@@ -525,7 +525,6 @@ MonoBehaviour:
   playerData: {fileID: 11400000, guid: 1df0ef4d005ebae49bb30f44614deca0, type: 2}
   mainCamera: {fileID: 963194227}
   gunController: {fileID: 1571953092}
-  startingHealth: 5
 --- !u!54 &1571953094
 Rigidbody:
   m_ObjectHideFlags: 0

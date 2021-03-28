@@ -3,7 +3,6 @@
 [CreateAssetMenu(menuName = "TopDown Shooter/Project Tile Settings")]
 public class ProjectTileSettings : ScriptableObject
 {
-    [Header("Bullet Settings")]
     [SerializeField] private float speed;
     [SerializeField] private float damage;
     [SerializeField] private float refireRate;
