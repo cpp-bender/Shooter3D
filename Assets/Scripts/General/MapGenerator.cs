@@ -4,16 +4,17 @@ using UnityEngine;
 public class MapGenerator : MonoBehaviour
 {
     [SerializeField] private Transform tilePrefab;
-    [SerializeField] private int obstacleCount;
     [SerializeField] private Transform obstaclePrefab;
     [SerializeField] private Vector2 mapSize;
     [Range(0f, 1f)] [SerializeField] private float tileOffSet;
+    [Range(0f, 1f)] [SerializeField] private float obstaclePercent;
+    [SerializeField] private int seed;
 
     private const string holderName = "Generated Map";
     private Transform mapHolder;
-
-    List<Coordinate> coordinates;
-    Queue<Coordinate> shuffledCoordinates;
+    private Coordinate center;
+    private List<Coordinate> coordinates;
+    private Queue<Coordinate> shuffledCoordinates;
 
     public void GenerateMap()
     {
@@ -21,6 +22,7 @@ public class MapGenerator : MonoBehaviour
         {
             DestroyImmediate(transform.Find(holderName).gameObject);
         }
+        center = new Coordinate((int)mapSize.x / 2, (int)mapSize.y / 2);
         InitializeMapHolder();
         GenerateTiles();
         GenerateObstacles();
@@ -28,15 +30,64 @@ public class MapGenerator : MonoBehaviour
 
     private void GenerateObstacles()
     {
-        shuffledCoordinates = new Queue<Coordinate>(Utility.Shuffle(coordinates.ToArray(), 1));
+        bool[,] obstacleMap = new bool[(int)mapSize.x, (int)mapSize.y];
+        shuffledCoordinates = new Queue<Coordinate>(Utility.Shuffle(coordinates.ToArray(), seed));
+        int obstacleCount = (int)(mapSize.x * mapSize.y * obstaclePercent);
+        int currentObstacleCount = 0;
         for (int i = 0; i < obstacleCount; i++)
         {
             Coordinate randomCoordinate = GetRandomCoordinate();
-            Vector3 obstaclePosition = CoordinateToPosition(randomCoordinate.x, randomCoordinate.y);
-            var newobstacle = Instantiate(obstaclePrefab, obstaclePosition + Vector3.up * .5f, Quaternion.identity);
-            newobstacle.transform.parent = mapHolder;
-            newobstacle.localScale = Vector3.one * (1 - tileOffSet);
+            obstacleMap[randomCoordinate.x, randomCoordinate.y] = true;
+            currentObstacleCount++;
+            if (randomCoordinate != center && IsMapFullyAccessible(obstacleMap, currentObstacleCount))
+            {
+                Vector3 obstaclePosition = CoordinateToPosition(randomCoordinate.x, randomCoordinate.y);
+                var newobstacle = Instantiate(obstaclePrefab, obstaclePosition + Vector3.up * .5f, Quaternion.identity);
+                newobstacle.transform.parent = mapHolder;
+                newobstacle.localScale = Vector3.one * (1 - tileOffSet);
+            }
+            else
+            {
+                obstacleMap[randomCoordinate.x, randomCoordinate.y] = false;
+                currentObstacleCount--;
+            }
         }
+    }
+
+    private bool IsMapFullyAccessible(bool[,] obstacleMap, int currentObstacleCount)
+    {
+        //The Flood-Fill Algorithm
+        bool[,] mapFlags = new bool[obstacleMap.GetLength(0), obstacleMap.GetLength(1)];
+        Queue<Coordinate> coordinates = new Queue<Coordinate>();
+        coordinates.Enqueue(center);
+        mapFlags[center.x, center.y] = true;
+        int accessibleTileCount = 1;
+        while (coordinates.Count > 0)
+        {
+            Coordinate tile = coordinates.Dequeue();
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    int neighbourX = tile.x + x;
+                    int neighbourY = tile.y + y;
+                    if (x == 0 | y == 0)
+                    {
+                        if ((neighbourX >= 0 && neighbourX < obstacleMap.GetLength(0)) && neighbourY >= 0 && neighbourY < obstacleMap.GetLength(1))
+                        {
+                            if (!mapFlags[neighbourX, neighbourY] && !obstacleMap[neighbourX, neighbourY])
+                            {
+                                mapFlags[neighbourX, neighbourY] = true;
+                                coordinates.Enqueue(new Coordinate(neighbourX, neighbourY));
+                                accessibleTileCount++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        int targetAccessibleTileCount = (int)(mapSize.x * mapSize.y - currentObstacleCount);
+        return targetAccessibleTileCount == accessibleTileCount;
     }
 
     private Vector3 CoordinateToPosition(int x, int y)
@@ -82,10 +133,17 @@ public struct Coordinate
 {
     public int x;
     public int y;
-
     public Coordinate(int _x, int _y)
     {
         x = _x;
         y = _y;
+    }
+    public static bool operator ==(Coordinate c1, Coordinate c2)
+    {
+        return c1.x == c2.x && c1.y == c2.y;
+    }
+    public static bool operator !=(Coordinate c1, Coordinate c2)
+    {
+        return !(c1 == c2);
     }
 }

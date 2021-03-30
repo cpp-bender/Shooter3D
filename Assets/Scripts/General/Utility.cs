@@ -2,7 +2,8 @@
 {
     public static T[] Shuffle<T>(T[] array, int seed)
     {
-        System.Random rnd = new System.Random();
+        //The Fisher-Yates Shuffe Algorithm
+        System.Random rnd = new System.Random(seed);
         for (int i = 0; i < array.Length - 1; i++)
         {
             int randomIndex = rnd.Next(i, array.Length);
