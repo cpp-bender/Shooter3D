@@ -15,7 +15,7 @@ MonoBehaviour:
   followRefreshRate: 1
   attackDistanceThreshold: 1
   timeBetweenAttacks: 0.5
-  startingHealth: 0
+  startingHealth: 2
   attackSpeed: 4
   damage: 1
-  skinColor: {r: 0, g: 1, b: 0, a: 1}
+  skinColor: {r: 0.13685815, g: 0.8018868, b: 0.11725702, a: 1}
