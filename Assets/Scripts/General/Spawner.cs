@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
     [SerializeField] private Entity enemy;
     [SerializeField] private Entity player;
+    [SerializeField] private MapGenerator map;
     [SerializeField] private Wave[] waves;
 
     //Current Wave Fields
@@ -15,7 +17,7 @@ public class Spawner : MonoBehaviour
 
     private void Start()
     {
-        InitializeNextWave();
+        InitializeWave();
         player.OnDeath += OnPlayerDeath;
     }
 
@@ -28,17 +30,41 @@ public class Spawner : MonoBehaviour
     {
         if (enemiesRemainingToSpawn > 0 && Time.time > nextSpawnTime)
         {
-            var spawnedEnemy = Instantiate(enemy, Vector3.zero, Quaternion.identity);
-            spawnedEnemy.OnDeath += OnEnemyDeath;
             enemiesRemainingToSpawn--;
             nextSpawnTime = Time.time + currentWave.TimeBetweenSpawns;
+            StartCoroutine(OnEnemySpawn());
         }
+    }
+
+    private IEnumerator OnEnemySpawn()
+    {
+        System.Random rnd = new System.Random();
+        float timer = 0f;
+        float delay = timer + 1f;
+        float bounceFactor = 6f;
+        Transform spawnTile = map.GetRandomOpenTile();
+
+        // 20% change to spawn enemy at player position.
+        if (rnd.Next(0, 5) == 0)
+        {
+            spawnTile = map.GetTileFromPosition(player.transform.position);
+        }
+        Color baseColor = spawnTile.GetComponent<Renderer>().material.color;
+        while (timer < delay)
+        {
+            spawnTile.GetComponent<Renderer>().material.color = Color.Lerp(baseColor, Color.red, Mathf.PingPong(timer * bounceFactor, 1));
+            timer += Time.deltaTime;
+            yield return null;
+        }
+        spawnTile.GetComponent<Renderer>().material.color = baseColor;
+        var spawnedEnemy = Instantiate(enemy, spawnTile.position + Vector3.up, Quaternion.identity);
+        spawnedEnemy.OnDeath += OnEnemyDeath;
     }
 
     private void OnEnemyDeath()
     {
         enemiesRemainingAlive--;
-        InitializeNextWave();
+        InitializeWave();
     }
 
     private void OnPlayerDeath()
@@ -46,7 +72,7 @@ public class Spawner : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    private void InitializeNextWave()
+    private void InitializeWave()
     {
         if (currentWaveNumber < waves.Length && enemiesRemainingAlive == 0)
         {
