@@ -7,6 +7,7 @@ public class ProjectTile : MonoBehaviour
 
     private PoolManager bulletPool;
     private EnemyManager enemy;
+    private Vector3 hitPoint;
     private float lifeTime;
 
     private void Awake()
@@ -26,6 +27,11 @@ public class ProjectTile : MonoBehaviour
         Destroy();
     }
 
+    private void Move()
+    {
+        transform.Translate(Vector3.forward * Time.deltaTime * projectTileSettings.Speed);
+    }
+
     private void Destroy()
     {
         if (Time.time > lifeTime)
@@ -43,29 +49,26 @@ public class ProjectTile : MonoBehaviour
         Ray ray = new Ray(transform.position, transform.forward);
         if (Physics.Raycast(ray, out hitInfo, moveDistance + moveDistanceOffset, collisionMask))
         {
-            OnHitEnter(hitInfo);
+            OnHitEnter(hitInfo.collider);
         }
     }
 
-    private void OnHitEnter(RaycastHit hitInfo)
+    private void OnHitEnter(Collider hitCollider)
     {
-        IDamageable damageable = hitInfo.collider.GetComponent<IDamageable>();
+        IDamageable damageable = hitCollider.GetComponent<IDamageable>();
         if (damageable != null)
         {
-            enemy = hitInfo.collider.gameObject.GetComponent<EnemyManager>();
+            enemy = hitCollider.gameObject.GetComponent<EnemyManager>();
+            hitPoint = hitCollider.gameObject.transform.position;
             enemy.OnDeath += OnEnemyDeath;
-            damageable.TakeHit(projectTileSettings.Damage, hitInfo);
+            damageable.TakeDamage(projectTileSettings.Damage);
         }
         bulletPool.ReturnToPool(gameObject);
     }
 
     private void OnEnemyDeath()
     {
+        enemy.PlayDeathEffect(hitPoint, transform.forward);
         Destroy(enemy.gameObject);
-    }
-
-    private void Move()
-    {
-        transform.Translate(Vector3.forward * Time.deltaTime * projectTileSettings.Speed);
     }
 }

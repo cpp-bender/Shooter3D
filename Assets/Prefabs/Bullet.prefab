@@ -97,3 +97,5 @@ MonoBehaviour:
   collisionMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  deathEffect: {fileID: 4954182366078795264, guid: a3861dbad66fd9746a2ce9943e8ca015,
+    type: 3}

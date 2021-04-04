@@ -110,9 +110,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agent: {fileID: 2250012160563569779}
   target: {fileID: 5395376705653932500, guid: 9203b9b141db52e44a3e1dda54a574b7, type: 3}
-  startingHealth: 2
   enemyData: {fileID: 11400000, guid: ded55d50ea48b614bbc845fbd016b9cd, type: 2}
   playerData: {fileID: 11400000, guid: 1df0ef4d005ebae49bb30f44614deca0, type: 2}
+  deathEffect: {fileID: 8013543787374436613, guid: a3861dbad66fd9746a2ce9943e8ca015,
+    type: 3}
 --- !u!195 &2250012160563569779
 NavMeshAgent:
   m_ObjectHideFlags: 0

@@ -14,6 +14,7 @@ public class EnemyManager : Entity
     [SerializeField] private Transform target;
     [SerializeField] private EnemySettings enemyData;
     [SerializeField] private PlayerSettings playerData;
+    [SerializeField] private ParticleSystem deathEffect;
 
     private State currentState = State.Idle;
     private float nextAttackTime;
@@ -48,6 +49,11 @@ public class EnemyManager : Entity
     private void Update()
     {
         TryToAttack();
+    }
+
+    public void PlayDeathEffect(Vector3 hitPoint, Vector3 hitDirection)
+    {
+        Instantiate(deathEffect, hitPoint, Quaternion.FromToRotation(Vector3.forward, hitDirection));
     }
 
     private void TryToAttack()

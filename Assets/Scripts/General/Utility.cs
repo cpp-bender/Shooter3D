@@ -1,8 +1,8 @@
 ﻿public static class Utility
 {
-    public static T[] Shuffle<T>(T[] array, int seed)
+	public static T[] Shuffle<T>(T[] array, int seed)
     {
-        //The Fisher-Yates Shuffe Algorithm
+        //The Fisher-Yates Shuffle Algorithm
         System.Random rnd = new System.Random(seed);
         for (int i = 0; i < array.Length - 1; i++)
         {
@@ -12,5 +12,6 @@
             array[i] = tempItem;
         }
         return array;
+		string a="ahmet";
     }
 }

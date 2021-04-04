@@ -6,7 +6,7 @@ public class Entity : MonoBehaviour, IDamageable
 
     public event System.Action OnDeath;
 
-    public void TakeDamage(float damage)
+    public  void TakeDamage(float damage)
     {
         health -= damage;
         if (health <= 0)
@@ -15,14 +15,8 @@ public class Entity : MonoBehaviour, IDamageable
         }
     }
 
-    public void TakeHit(float damage, RaycastHit hitInfo)
-    {
-        //Will do some stuff later
-        TakeDamage(damage);
-    }
-
     private void Die()
     {
-        OnDeath?.Invoke();    
+        OnDeath?.Invoke();
     }
 }
