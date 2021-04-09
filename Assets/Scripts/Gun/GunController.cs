@@ -20,4 +20,9 @@ public class GunController : MonoBehaviour
     {
         currentGun.Shoot();
     }
+
+    public float GetGunHeight()
+    {
+        return weaponHold.transform.position.y;
+    }
 }

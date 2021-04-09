@@ -7,6 +7,8 @@ public class PlayerController : Entity
     [SerializeField] private PlayerSettings playerData;
     [SerializeField] private Camera mainCamera;
     [SerializeField] private GunController gunController;
+    [SerializeField] private Transform crosshair;
+    [SerializeField] private Transform weaponHold;
 
     private Vector3 moveVelocity;
 
@@ -21,12 +23,6 @@ public class PlayerController : Entity
         this.OnDeath += OnPlayerDeath;
     }
 
-    private void OnPlayerDeath()
-    {
-        playerData.IsPlayerDead = true;
-        Destroy(gameObject);
-    }
-
     private void Update()
     {
         Rotate();
@@ -38,6 +34,12 @@ public class PlayerController : Entity
         Move();
     }
 
+    private void OnPlayerDeath()
+    {
+        playerData.IsPlayerDead = true;
+        Destroy(gameObject);
+    }
+
     private void Move()
     {
         moveVelocity = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
@@ -47,12 +49,13 @@ public class PlayerController : Entity
     private void Rotate()
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        Plane ground = new Plane(Vector3.up, Vector3.zero);
+        Plane ground = new Plane(Vector3.up, Vector3.up * gunController.GetGunHeight());
         float rayDistance;
         if (ground.Raycast(ray, out rayDistance))
         {
             Vector3 rayPoint = ray.GetPoint(rayDistance);
-            Debug.DrawLine(ray.origin, rayPoint, Color.red);
+            crosshair.transform.position = rayPoint;
+            crosshair.GetComponent<Crosshair>().DetectEnemy(ray, rayDistance);
             Vector3 lookPoint = new Vector3(rayPoint.x, transform.position.y, rayPoint.z);
             transform.LookAt(lookPoint);
         }
