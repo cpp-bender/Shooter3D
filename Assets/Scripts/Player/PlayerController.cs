@@ -37,7 +37,7 @@ public class PlayerController : Entity
     private void OnPlayerDeath()
     {
         playerData.IsPlayerDead = true;
-        Destroy(gameObject);
+        gameObject.SetActive(false);
     }
 
     private void Move()

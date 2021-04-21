@@ -12,6 +12,5 @@
             array[i] = tempItem;
         }
         return array;
-		string a="ahmet";
     }
 }
